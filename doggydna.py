@@ -1,4 +1,3 @@
-from pymongo import MongoClient
 import praw
 import os
 import pdb as p
@@ -17,14 +16,11 @@ def get_images():
   subreddit = reddit.subreddit("doggydna")
   image_iterator = 0
   sizes = []
-  data = {
-    "images": [],
-  }
 
   if not os.path.exists(f"images/"):
     os.mkdir(f"images/")
 
-  for submission in subreddit.new(limit=1000):
+  for submission in subreddit.new(limit=1):
     try:
       if submission.media_metadata:
         items = submission.media_metadata.items()
@@ -33,7 +29,6 @@ def get_images():
             os.mkdir(f"images/{submission.id}")
 
             for key, value in items:
-
               if value["e"] == "Image":
                 for image_data in value["p"]:
                   size = image_data["y"]
@@ -53,13 +48,5 @@ def get_images():
     except Exception as e:
       print(e)
       continue
-
-def get_database():
-  client = MongoClient(os.environ["MONGO_DB_URI"])
-  return client.get_default_database()
-
-def connect_to_collection():
-  db = get_database()
-  return db["dogs"]
 
 get_images()
